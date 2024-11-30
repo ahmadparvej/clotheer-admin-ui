@@ -6,13 +6,37 @@ import {
   Form,
   Input,
   Layout,
+  message,
   Space,
   Typography,
 } from "antd";
 import { KeyOutlined, LockFilled, UserOutlined } from "@ant-design/icons";
+import { useMutation } from "@tanstack/react-query";
+import { Credentials } from "../../types";
+import { login } from './../../http/api';
 
 const LoginPage = () => {
   const { Title } = Typography;
+  const [messageApi, contextHolder] = message.useMessage();
+  
+  const loginUser = async ( credentials: Credentials ) => {
+    const data = await login(credentials);
+    return data;
+  };
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: loginUser,
+    onSuccess: async () => {
+      console.log("success");
+      messageApi.info('Hello, Ant Design!');
+    },
+    onError: (error) => {
+      console.log(error);
+      messageApi.error(error.message);
+    }
+  });
+
 
   return (
     <>
@@ -39,7 +63,11 @@ const LoginPage = () => {
               </Space>
             }
           >
-            <Form initialValues={{ remember: true }}>
+            <Form
+              initialValues={{ remember: true }}
+              onFinish={(values) => mutate({ email: values.Username, password: values.Password })}
+            >
+              {contextHolder}
               <Form.Item
                 name="Username"
                 rules={[
@@ -67,7 +95,9 @@ const LoginPage = () => {
               >
                 <Flex justify="space-between">
                   <Checkbox>Remember me</Checkbox>
-                  <Button type="link" size="small">Forgot password?</Button> 
+                  <Button type="link" size="small">
+                    Forgot password?
+                  </Button>
                 </Flex>
               </Form.Item>
               <Form.Item>
@@ -75,6 +105,7 @@ const LoginPage = () => {
                   type="primary"
                   htmlType="submit"
                   style={{ width: "100%" }}
+                  loading={isPending}
                 >
                   Log in
                 </Button>
