@@ -11,9 +11,9 @@ import {
   Typography,
 } from "antd";
 import { KeyOutlined, LockFilled, UserOutlined } from "@ant-design/icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "../../types";
-import { login } from './../../http/api';
+import { login, self } from './../../http/api';
 
 const LoginPage = () => {
   const { Title } = Typography;
@@ -24,12 +24,24 @@ const LoginPage = () => {
     return data;
   };
 
+  const getSelf = async () => {
+    const data = await self();
+    return data;
+  };
+
+  const { data: selfData, refetch } = useQuery({
+    queryKey: ["self"],
+    queryFn: getSelf,
+    enabled: false
+  });
+
   const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
-      console.log("success");
-      messageApi.info('Hello, Ant Design!');
+      refetch();
+      console.log("data", selfData);
+      messageApi.info('Login successful!');
     },
     onError: (error) => {
       console.log(error);
