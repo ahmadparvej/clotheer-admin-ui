@@ -12,7 +12,7 @@ export interface User {
 interface AuthState {
     user: User | null;
     setUser: (user: User) => void;
-    logout: () => void;
+    removeUser: () => void;
 }
 
 //create zustand store for user
@@ -20,6 +20,6 @@ export const useAuthStore = create<AuthState>()(
     devtools((set) => ({
         user: null,
         setUser: (user: User) => set({ user }),
-        logout: () => set({ user: null }),
+        removeUser: () => set({ user: null }),
     }))
 )
