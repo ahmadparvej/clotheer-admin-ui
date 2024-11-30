@@ -13,17 +13,17 @@ import {
 import { KeyOutlined, LockFilled, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "../../types";
-import { login, self, logout } from './../../http/api';
+import { login, self, logout } from "./../../http/api";
 import { useAuthStore } from "../../store/store";
-import { usePermission } from './../../hooks/userPermission';
+import { usePermission } from "./../../hooks/userPermission";
 
 const LoginPage = () => {
   const { Title } = Typography;
   const [messageApi, contextHolder] = message.useMessage();
   const { setUser, removeUser } = useAuthStore();
   const { isAllowed } = usePermission();
-  
-  const loginUser = async ( credentials: Credentials ) => {
+
+  const loginUser = async (credentials: Credentials) => {
     const data = await login(credentials);
     return data;
   };
@@ -36,27 +36,34 @@ const LoginPage = () => {
   const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
-    enabled: false
+    enabled: false,
   });
+
+  // mutate logout
+  const { mutate: mutateLogout } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: () => {
+      removeUser();
+    },
+  })
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
       const selfData = await refetch();
-      if(!isAllowed(selfData?.data?.data)){
-        removeUser();
-        logout();
-        return; 
+      if (!isAllowed(selfData?.data?.data)) {
+        mutateLogout();
+        return;
       }
       setUser(selfData?.data?.data);
-      messageApi.info('Login successful!');
+      messageApi.info("Login successful!");
     },
     onError: (error) => {
       messageApi.error(error.message);
-    }
+    },
   });
-
 
   return (
     <>
@@ -85,7 +92,9 @@ const LoginPage = () => {
           >
             <Form
               initialValues={{ remember: true }}
-              onFinish={(values) => mutate({ email: values.Username, password: values.Password })}
+              onFinish={(values) =>
+                mutate({ email: values.Username, password: values.Password })
+              }
             >
               {contextHolder}
               <Form.Item
