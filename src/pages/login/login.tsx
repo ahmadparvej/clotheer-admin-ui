@@ -14,10 +14,12 @@ import { KeyOutlined, LockFilled, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "../../types";
 import { login, self } from './../../http/api';
+import { useAuthStore } from "../../store/store";
 
 const LoginPage = () => {
   const { Title } = Typography;
   const [messageApi, contextHolder] = message.useMessage();
+  const { setUser } = useAuthStore();
   
   const loginUser = async ( credentials: Credentials ) => {
     const data = await login(credentials);
@@ -29,7 +31,7 @@ const LoginPage = () => {
     return data;
   };
 
-  const { data: selfData, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
     enabled: false
@@ -39,12 +41,11 @@ const LoginPage = () => {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
-      refetch();
-      console.log("data", selfData);
+      const selfData = await refetch();
+      setUser(selfData?.data?.data);
       messageApi.info('Login successful!');
     },
     onError: (error) => {
-      console.log(error);
       messageApi.error(error.message);
     }
   });
