@@ -1,9 +1,6 @@
 
-function HomePage() {
-
+export const HomePage = () => {
   return (
-    <h1>Hello from clotheer admin</h1>
+    <div>Hello from HomePage</div>
   )
 }
-
-export default HomePage
