@@ -17,6 +17,12 @@ import { login, self, logout } from "./../../http/api";
 import { useAuthStore } from "../../store/store";
 import { usePermission } from "./../../hooks/userPermission";
 
+const getSelf = async () => {
+  const response = await self();
+  console.log("getself", response);
+  return response;
+};
+
 const LoginPage = () => {
   const { Title } = Typography;
   const [messageApi, contextHolder] = message.useMessage();
@@ -25,11 +31,6 @@ const LoginPage = () => {
 
   const loginUser = async (credentials: Credentials) => {
     const data = await login(credentials);
-    return data;
-  };
-
-  const getSelf = async () => {
-    const data = await self();
     return data;
   };
 
@@ -53,11 +54,12 @@ const LoginPage = () => {
     mutationFn: loginUser,
     onSuccess: async () => {
       const selfData = await refetch();
-      if (!isAllowed(selfData?.data?.data)) {
+      console.log("selfdata",selfData)
+      if (!isAllowed(selfData?.data)) {
         mutateLogout();
         return;
       }
-      setUser(selfData?.data?.data);
+      setUser(selfData?.data);
       messageApi.info("Login successful!");
     },
     onError: (error) => {
