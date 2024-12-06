@@ -30,21 +30,31 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
-  getItem(<NavLink to={"/"}>Home</NavLink>, '1', <Icon component={Home} />),
-  getItem(<NavLink to={"/users"}>Users</NavLink>, '2', <Icon component={UserIcon} />),
-  getItem(<NavLink to={"/products"}>Products</NavLink>, '3', <Icon component={BasketIcon} />),
-  getItem(<NavLink to={"/sales"}>Sales</NavLink>, '3', <Icon component={BagIcon} />),
-  getItem(<NavLink to={"/promo"}>Promo</NavLink>, '4', <Icon component={GiftIcon} />),
-];
+const getMenuItemByUserRole = (role: string) => {
+  const baseMenuItems = [
+    getItem(<NavLink to={"/"}>Home</NavLink>, '1', <Icon component={Home} />),
+    getItem(<NavLink to={"/products"}>Products</NavLink>, '3', <Icon component={BasketIcon} />),
+    getItem(<NavLink to={"/sales"}>Sales</NavLink>, '3', <Icon component={BagIcon} />),
+    getItem(<NavLink to={"/promo"}>Promo</NavLink>, '4', <Icon component={GiftIcon} />),
+  ]
+
+  // add users items if user is admin using splice
+  if(role === "admin"){
+    baseMenuItems.splice(1, 0, getItem(<NavLink to={"/users"}>Users</NavLink>, '2', <Icon component={UserIcon} />))
+  }
+
+  return baseMenuItems
+}
 
 export const DashboardLayout = () => {
-
+  
   const { user } = useAuthStore();
   if(user == null){
     return <Navigate to="/auth/login" replace={true}/>
   }
 
+  const items: MenuItem[] = getMenuItemByUserRole(user.role);
+  
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer },
@@ -56,7 +66,7 @@ export const DashboardLayout = () => {
     mutationFn: logout,
     onSuccess: () => {
       removeUser();
-      return;
+      return <Navigate to="/auth/login" replace={true}/>;
     },
   })
 
