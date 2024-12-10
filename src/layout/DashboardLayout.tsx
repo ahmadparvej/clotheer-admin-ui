@@ -34,8 +34,8 @@ const getMenuItemByUserRole = (role: string) => {
   const baseMenuItems = [
     getItem(<NavLink to={"/"}>Home</NavLink>, '1', <Icon component={Home} />),
     getItem(<NavLink to={"/products"}>Products</NavLink>, '3', <Icon component={BasketIcon} />),
-    getItem(<NavLink to={"/sales"}>Sales</NavLink>, '3', <Icon component={BagIcon} />),
-    getItem(<NavLink to={"/promo"}>Promo</NavLink>, '4', <Icon component={GiftIcon} />),
+    getItem(<NavLink to={"/sales"}>Sales</NavLink>, '4', <Icon component={BagIcon} />),
+    getItem(<NavLink to={"/promo"}>Promo</NavLink>, '5', <Icon component={GiftIcon} />),
   ]
 
   // add users items if user is admin using splice

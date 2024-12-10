@@ -4,7 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
-import { useAuthStore } from './../../store/store';
+import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
 
 const columns: TableProps<User>["columns"] = [
@@ -64,11 +64,19 @@ export const UsersPage = () => {
 
   return (
     <>
-      <Breadcrumb style={{ margin: "0 0 16px 0" }} separator={<RightOutlined />} items={breadcrumbItems} />
+      <Breadcrumb
+        style={{ margin: "0 0 16px 0" }}
+        separator={<RightOutlined />}
+        items={breadcrumbItems}
+      />
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
-        <UserFilter/>
+        <UserFilter
+          onFilterChange={(filterName, filterValue) => {
+            console.log("filter changed", filterName, filterValue);
+          }}
+        />
         {users && <Table columns={columns} dataSource={users} />}
       </Space>
     </>
