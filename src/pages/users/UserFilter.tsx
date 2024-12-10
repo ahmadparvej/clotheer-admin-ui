@@ -4,9 +4,10 @@ import { PlusOutlined } from "@ant-design/icons";
 
 type UserFilterProps = {
   onFilterChange: (filterName: string, filterValue: string) => void;
+  onCreateClick: () => void;
 };
 
-const UserFilter = ({ onFilterChange }: UserFilterProps) => {
+const UserFilter = ({ onFilterChange, onCreateClick }: UserFilterProps) => {
   return (
     <Card>
       <Row justify={"space-between"}>
@@ -47,8 +48,7 @@ const UserFilter = ({ onFilterChange }: UserFilterProps) => {
           </Row>
         </Col>
         <Col span={8} style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button type="primary" icon={<PlusOutlined />}>
-            {" "}
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreateClick}>
             Create User
           </Button>
         </Col>

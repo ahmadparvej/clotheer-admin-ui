@@ -1,7 +1,8 @@
-import { Breadcrumb, Space, Table, TableProps } from "antd";
 import { RightOutlined } from "@ant-design/icons";
-import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Breadcrumb, Modal, Space, Table, TableProps } from "antd";
+import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "./../../store/store";
@@ -57,6 +58,7 @@ export const UsersPage = () => {
     queryFn: getUsers,
   });
 
+  const [open, setOpen] = useState(false);
   const { user } = useAuthStore();
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
@@ -76,8 +78,23 @@ export const UsersPage = () => {
           onFilterChange={(filterName, filterValue) => {
             console.log("filter changed", filterName, filterValue);
           }}
+          onCreateClick={() => {
+            setOpen(true);
+          }}
         />
         {users && <Table columns={columns} dataSource={users} />}
+        <Modal
+          title="Modal 1000px width"
+          centered
+          open={open}
+          onOk={() => setOpen(false)}
+          onCancel={() => setOpen(false)}
+          width={1000}
+        >
+          <p>some contents...</p>
+          <p>some contents...</p>
+          <p>some contents...</p>
+        </Modal>
       </Space>
     </>
   );
