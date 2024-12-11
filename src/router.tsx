@@ -22,6 +22,20 @@ export const router = createBrowserRouter([
           {
             path: "/users",
             element: <UsersPage />,
+            children: [
+              {
+                path: ":id",
+                element: <div>user detail</div>,
+              },
+              {
+                path: ":id/edit",
+                element: <div>user edit</div>,
+              },
+              {
+                path: ":id/add",
+                element: <div>user add</div>,
+              },
+            ],
           },
         ],
       },
