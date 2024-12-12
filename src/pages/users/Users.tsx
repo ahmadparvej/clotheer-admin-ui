@@ -1,12 +1,13 @@
 import { RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Modal, Space, Table, TableProps } from "antd";
+import { Breadcrumb, Form, Modal, Space, Table, TableProps, theme } from "antd";
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
+import UserForm from "./forms/UserForm";
 
 const columns: TableProps<User>["columns"] = [
   {
@@ -60,6 +61,8 @@ export const UsersPage = () => {
 
   const [open, setOpen] = useState(false);
   const { user } = useAuthStore();
+  const { token: { colorBgLayout } } = theme.useToken();
+
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
@@ -85,15 +88,16 @@ export const UsersPage = () => {
         {users && <Table columns={columns} dataSource={users} />}
         <Modal
           title="Modal 1000px width"
+          styles={{ body: { backgroundColor: colorBgLayout } }}
           centered
           open={open}
           onOk={() => setOpen(false)}
           onCancel={() => setOpen(false)}
           width={1000}
         >
-          <p>some contents...</p>
-          <p>some contents...</p>
-          <p>some contents...</p>
+          <Form layout="vertical">
+            <UserForm/>
+          </Form>
         </Modal>
       </Space>
     </>
