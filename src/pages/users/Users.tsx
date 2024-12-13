@@ -1,6 +1,6 @@
 import { RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Form, Modal, Space, Table, TableProps, theme } from "antd";
+import { Breadcrumb, Form, Modal, Space, Table, TableProps } from "antd";
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
@@ -61,7 +61,6 @@ export const UsersPage = () => {
 
   const [open, setOpen] = useState(false);
   const { user } = useAuthStore();
-  const { token: { colorBgLayout } } = theme.useToken();
 
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
@@ -87,13 +86,13 @@ export const UsersPage = () => {
         />
         {users && <Table columns={columns} dataSource={users} />}
         <Modal
-          title="Modal 1000px width"
-          styles={{ body: { backgroundColor: colorBgLayout } }}
+          title="Create new user"
           centered
           open={open}
           onOk={() => setOpen(false)}
           onCancel={() => setOpen(false)}
           width={1000}
+          okText="Create"
         >
           <Form layout="vertical">
             <UserForm/>
