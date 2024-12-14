@@ -11,6 +11,7 @@ import GiftIcon from './../components/icons/GiftIcon';
 import Home from './../components/icons/Home';
 import UserIcon from './../components/icons/UserIcon';
 import { logout } from './../http/api';
+import { useLocation } from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -32,15 +33,15 @@ function getItem(
 
 const getMenuItemByUserRole = (role: string) => {
   const baseMenuItems = [
-    getItem(<NavLink to={"/"}>Home</NavLink>, '1', <Icon component={Home} />),
-    getItem(<NavLink to={"/products"}>Products</NavLink>, '3', <Icon component={BasketIcon} />),
-    getItem(<NavLink to={"/sales"}>Sales</NavLink>, '4', <Icon component={BagIcon} />),
-    getItem(<NavLink to={"/promo"}>Promo</NavLink>, '5', <Icon component={GiftIcon} />),
+    getItem(<NavLink to={"/"}>Home</NavLink>, 'home', <Icon component={Home} />),
+    getItem(<NavLink to={"/products"}>Products</NavLink>, 'product', <Icon component={BasketIcon} />),
+    getItem(<NavLink to={"/sales"}>Sales</NavLink>, 'sales', <Icon component={BagIcon} />),
+    getItem(<NavLink to={"/promo"}>Promo</NavLink>, 'promo', <Icon component={GiftIcon} />),
   ]
 
   // add users items if user is admin using splice
   if(role === "admin"){
-    baseMenuItems.splice(1, 0, getItem(<NavLink to={"/users"}>Users</NavLink>, '2', <Icon component={UserIcon} />))
+    baseMenuItems.splice(1, 0, getItem(<NavLink to={"/users"}>Users</NavLink>, 'users', <Icon component={UserIcon} />))
   }
 
   return baseMenuItems
@@ -48,6 +49,8 @@ const getMenuItemByUserRole = (role: string) => {
 
 export const DashboardLayout = () => {
   
+  const location = useLocation();
+  const { pathname } = location;
   const { user, removeUser } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -104,12 +107,15 @@ export const DashboardLayout = () => {
     },
   ];  
 
+  // find key of active menu item
+  const activeMenuItemKey = items.find((item: MenuItem) => item?.key === pathname.split("/")[1])?.key || 'home';
+  
   return (
     <div>
       <Layout style={{ minHeight: '100vh' }}>
       <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <h3 style={{ padding: '20px 30px', margin: '0' }}>Clotheer</h3>
-        <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <Menu theme="light" defaultSelectedKeys={['home']} selectedKeys={[activeMenuItemKey.toString()]} mode="inline" items={items} />
       </Sider>
       <Layout>
         <Header style={{ padding: "0 24px", background: colorBgContainer }}>
