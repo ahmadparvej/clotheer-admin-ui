@@ -11,3 +11,11 @@ export type User = {
     email: string;
     role: string;
 };
+
+export type CreateUser = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role: string;
+}

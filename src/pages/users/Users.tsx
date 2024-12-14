@@ -1,6 +1,6 @@
 import { RightOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Form, Modal, Space, Table, TableProps } from "antd";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Breadcrumb, Form, message, Modal, Space, Table, TableProps } from "antd";
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
@@ -8,6 +8,7 @@ import { User } from "../../types";
 import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
 import UserForm from "./forms/UserForm";
+import { createUser } from './../../http/api';
 
 const columns: TableProps<User>["columns"] = [
   {
@@ -49,6 +50,13 @@ const breadcrumbItems = [
 ];
 
 export const UsersPage = () => {
+  
+  const { user } = useAuthStore();
+  const [form] = Form.useForm();
+  const [open, setOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+  const queryClient = useQueryClient();
+
   const {
     data: users,
     isLoading,
@@ -59,15 +67,34 @@ export const UsersPage = () => {
     queryFn: getUsers,
   });
 
-  const [open, setOpen] = useState(false);
-  const { user } = useAuthStore();
+  const { mutate: createUserMutation } = useMutation({
+    mutationFn: async (user: User) => {
+      await createUser(user);
+    },
+    mutationKey: ["createUser"],
+    onSuccess: () => {
+      setOpen(false);
+      form.resetFields();
+      messageApi.success("User created successfully", 5);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      messageApi.error(error.message, 5);
+    },
+  })
 
-  if (user?.role !== "admin") {
+  const onHandleSubmit = async () => {
+    await form.validateFields();
+    createUserMutation(form.getFieldsValue());
+  };
+    
+  if (user && user.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
 
   return (
     <>
+      {contextHolder}
       <Breadcrumb
         style={{ margin: "0 0 16px 0" }}
         separator={<RightOutlined />}
@@ -84,17 +111,17 @@ export const UsersPage = () => {
             setOpen(true);
           }}
         />
-        {users && <Table columns={columns} dataSource={users} />}
+        {users && <Table columns={columns} dataSource={users} pagination={false} rowKey="id" />}
         <Modal
           title="Create new user"
           centered
           open={open}
-          onOk={() => setOpen(false)}
+          onOk={() => onHandleSubmit()}
           onCancel={() => setOpen(false)}
           width={1000}
-          okText="Create"
+          okText="Save"
         >
-          <Form layout="vertical">
+          <Form layout="vertical" form={form}>
             <UserForm/>
           </Form>
         </Modal>

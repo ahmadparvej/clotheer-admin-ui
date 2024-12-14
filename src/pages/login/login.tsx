@@ -55,12 +55,19 @@ const LoginPage = () => {
     onSuccess: async () => {
       const selfData = await refetch();
       console.log("selfdata",selfData)
-      if (!isAllowed(selfData?.data)) {
-        mutateLogout();
-        return;
+
+      if (selfData?.data) {
+        if (!isAllowed(selfData.data)) {
+          mutateLogout();
+          return;
+        }
+        setUser(selfData.data);
+        messageApi.info("Login successful!");
+      } else {
+        // handle the case where selfData?.data is undefined
+        messageApi.error("Failed to retrieve user data");
       }
-      setUser(selfData?.data);
-      messageApi.info("Login successful!");
+
     },
     onError: (error) => {
       messageApi.error(error.message);

@@ -16,3 +16,7 @@ export const getUsers = async (): Promise<readonly User[]> => {
   const data: readonly User[] = await api.get("/users");
   return data ?? [] ;
 };
+
+export const createUser = async (user: User) => {
+  await api.post("/users", user);
+}; 

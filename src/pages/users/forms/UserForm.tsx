@@ -53,7 +53,22 @@ const UserForm = () => {
                 <Form.Item
                   label="Confirm Password"
                   name="confirmPassword"
-                  rules={[{ required: true }]}
+                  dependencies={['password']}
+                  hasFeedback
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please confirm your password!',
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue('password') === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('The new password that you entered do not match!'));
+                      },
+                    }),
+                  ]}
                 >
                   <Input />
                 </Form.Item>
