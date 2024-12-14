@@ -66,7 +66,7 @@ export const DashboardLayout = () => {
     mutationFn: logout,
     onSuccess: () => {
       removeUser();
-      return <Navigate to="/auth/login" replace={true}/>;
+      window.location.href = "/auth/login";
     },
   })
 
