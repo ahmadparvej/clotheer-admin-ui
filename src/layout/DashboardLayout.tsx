@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { NavLink, Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from "../store/store";
 import Icon, { DownOutlined, SettingOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import type { MenuProps } from 'antd';
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
+import React, { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import { useAuthStore } from "../store/store";
 import { BagIcon } from './../components/icons/BagIcon';
 import BasketIcon from './../components/icons/BasketIcon';
 import GiftIcon from './../components/icons/GiftIcon';
 import Home from './../components/icons/Home';
 import UserIcon from './../components/icons/UserIcon';
-import { useMutation } from '@tanstack/react-query';
 import { logout } from './../http/api';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -48,19 +48,15 @@ const getMenuItemByUserRole = (role: string) => {
 
 export const DashboardLayout = () => {
   
-  const { user } = useAuthStore();
-  if(user == null){
-    return <Navigate to="/auth/login" replace={true}/>
-  }
-
-  const items: MenuItem[] = getMenuItemByUserRole(user.role);
-  
+  const { user, removeUser } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
+
+  const items: MenuItem[] = user ? getMenuItemByUserRole(user.role) : [];
+  
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const { removeUser } = useAuthStore();
   const { mutate: mutateLogout } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logout,
@@ -118,7 +114,7 @@ export const DashboardLayout = () => {
       <Layout>
         <Header style={{ padding: "0 24px", background: colorBgContainer }}>
           <Flex justify="space-between" align="center" >
-            <Badge text={user.role == "admin" ? "Admin" : user?.tenant?.name} status='success'/>
+            <Badge text={user?.role == "admin" ? "Admin" : user?.tenant?.name} status='success'/>
             <Flex align="center" gap={10}>
               <Badge dot={true}>
                 <Icon component={BagIcon} />
