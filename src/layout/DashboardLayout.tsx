@@ -1,4 +1,4 @@
-import Icon, { DownOutlined, SettingOutlined } from '@ant-design/icons';
+import Icon, { SettingOutlined } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
 import type { MenuProps } from 'antd';
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
@@ -12,6 +12,7 @@ import Home from './../components/icons/Home';
 import UserIcon from './../components/icons/UserIcon';
 import { logout } from './../http/api';
 import { useLocation } from 'react-router-dom';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -127,8 +128,7 @@ export const DashboardLayout = () => {
               </Badge>
               <Dropdown menu={{ items: profileItems }}>
                 <Space>
-                  <Avatar style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>U</Avatar>
-                  <DownOutlined />
+                  <Avatar style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}><UserOutlined /></Avatar>
                 </Space>
               </Dropdown>
             </Flex>
