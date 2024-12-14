@@ -1,17 +1,11 @@
 import { Typography } from "antd";
 import { Card, Row, Col, List, Tag, Button } from "antd";
+import { useAuthStore } from "../store/store";
 
 const { Title } = Typography;
 
 export const HomePage = () => {
-  // const salesData = [
-  //   { name: "1 Jan", sales: 10000 },
-  //   { name: "2 Jan", sales: 15000 },
-  //   { name: "3 Jan", sales: 25000 },
-  //   { name: "4 Jan", sales: 20000 },
-  //   { name: "5 Jan", sales: 30000 },
-  //   { name: "6 Jan", sales: 35000 },
-  // ];
+  const { user } = useAuthStore();
 
   const recentOrders = [
     {
@@ -42,7 +36,7 @@ export const HomePage = () => {
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      <Title level={4}>Welcome, Parvej 😊</Title>
+      <Title level={4}>Welcome, {user?.firstName} 😊</Title>
       <Row gutter={12}>
         <Col span={12}>
           <Row gutter={[16, 16]}>
