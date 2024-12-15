@@ -9,15 +9,21 @@ import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
 import UserForm from "./forms/UserForm";
 import { createUser } from './../../http/api';
+import { PER_PAGE_LIMIT } from './../../constants/constants';
 
 const columns: TableProps<User>["columns"] = [
+  {
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
+  },
   {
     title: "Name",
     dataIndex: "firstName",
     key: "firstName",
     render: (text, record) => {
       return (
-        <Link to={`/users/${record.id}`}>
+        <Link to={`/users/${record.id}`} style={{ color: "#1890ff" }}>
           {text} {record.lastName}
         </Link>
       );
@@ -56,6 +62,10 @@ export const UsersPage = () => {
   const [open, setOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
+  const [queryParams, setQueryParams] = useState({
+    page: 1,
+    limit: PER_PAGE_LIMIT,
+  });
 
   const {
     data: users,
@@ -63,8 +73,11 @@ export const UsersPage = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
+    queryKey: ["users", queryParams],
+    queryFn: () => {
+      const queryString = new URLSearchParams(queryParams as unknown as Record<string, string>).toString();
+      return getUsers(queryString); 
+    },
   });
 
   const { mutate: createUserMutation } = useMutation({
@@ -111,7 +124,25 @@ export const UsersPage = () => {
             setOpen(true);
           }}
         />
-        {users && <Table columns={columns} dataSource={users} pagination={false} rowKey="id" />}
+        {users && (
+          <Table
+            columns={columns}
+            dataSource={users?.data}
+            rowKey="id"
+            pagination={{
+              current: queryParams.page,
+              pageSize: queryParams.limit,
+              total: users?.total,
+              onChange: (page) => {
+                console.log("page changed", page);
+                setQueryParams((prev) => ({
+                  ...prev,
+                  page,
+                }));
+              }
+            }}
+          />
+        )}
         <Modal
           title="Create new user"
           centered
@@ -122,7 +153,7 @@ export const UsersPage = () => {
           okText="Save"
         >
           <Form layout="vertical" form={form}>
-            <UserForm/>
+            <UserForm />
           </Form>
         </Modal>
       </Space>

@@ -1,4 +1,4 @@
-import { Credentials, User } from "../types";
+import { Credentials, User, UsersData } from "../types";
 import api from "./client";
 
 //Auth Service
@@ -12,8 +12,8 @@ export const self = async (): Promise<User> => {
   return data ?? {};
 };
 
-export const getUsers = async (): Promise<readonly User[]> => {
-  const data: readonly User[] = await api.get("/users");
+export const getUsers = async (params: string): Promise<UsersData> => {
+  const data: UsersData = await api.get(`/users?${params}`);
   return data ?? [] ;
 };
 

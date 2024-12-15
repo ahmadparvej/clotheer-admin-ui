@@ -12,6 +12,13 @@ export type User = {
     role: string;
 };
 
+export type UsersData = {
+    total: number;
+    page: number;
+    limit: number;
+    data: User[];
+}
+
 export type CreateUser = {
     firstName: string;
     lastName: string;
