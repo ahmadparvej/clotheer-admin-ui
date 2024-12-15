@@ -113,7 +113,7 @@ export const DashboardLayout = () => {
   
   return (
     <div>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout style={{ maxHeight: '100vh', minHeight: '100vh' }}>
       <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <h3 style={{ padding: '20px 30px', margin: '0' }}>Clotheer</h3>
         <Menu theme="light" defaultSelectedKeys={['home']} selectedKeys={[activeMenuItemKey.toString()]} mode="inline" items={items} />
