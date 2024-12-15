@@ -1,6 +1,22 @@
-import { RightOutlined } from "@ant-design/icons";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Breadcrumb, Form, message, Modal, Space, Table, TableProps } from "antd";
+import { LoadingOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
+import {
+  Breadcrumb,
+  Flex,
+  Form,
+  message,
+  Modal,
+  Space,
+  Spin,
+  Table,
+  TableProps,
+  Typography,
+} from "antd";
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
@@ -8,8 +24,8 @@ import { User } from "../../types";
 import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
 import UserForm from "./forms/UserForm";
-import { createUser } from './../../http/api';
-import { PER_PAGE_LIMIT } from './../../constants/constants';
+import { createUser } from "./../../http/api";
+import { PER_PAGE_LIMIT } from "./../../constants/constants";
 
 const columns: TableProps<User>["columns"] = [
   {
@@ -56,7 +72,6 @@ const breadcrumbItems = [
 ];
 
 export const UsersPage = () => {
-  
   const { user } = useAuthStore();
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
@@ -69,15 +84,18 @@ export const UsersPage = () => {
 
   const {
     data: users,
-    isLoading,
+    isFetching,
     isError,
     error,
   } = useQuery({
     queryKey: ["users", queryParams],
     queryFn: () => {
-      const queryString = new URLSearchParams(queryParams as unknown as Record<string, string>).toString();
-      return getUsers(queryString); 
+      const queryString = new URLSearchParams(
+        queryParams as unknown as Record<string, string>
+      ).toString();
+      return getUsers(queryString);
     },
+    placeholderData: keepPreviousData,
   });
 
   const { mutate: createUserMutation } = useMutation({
@@ -94,13 +112,13 @@ export const UsersPage = () => {
     onError: (error) => {
       messageApi.error(error.message, 5);
     },
-  })
+  });
 
   const onHandleSubmit = async () => {
     await form.validateFields();
     createUserMutation(form.getFieldsValue());
   };
-    
+
   if (user && user.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
@@ -108,14 +126,18 @@ export const UsersPage = () => {
   return (
     <>
       {contextHolder}
-      <Breadcrumb
-        style={{ margin: "0 0 16px 0" }}
-        separator={<RightOutlined />}
-        items={breadcrumbItems}
-      />
+      <Flex justify="space-between">
+        <Breadcrumb
+          style={{ margin: "0 0 16px 0" }}
+          separator={<RightOutlined />}
+          items={breadcrumbItems}
+        />
+        {isFetching && <Spin indicator={<LoadingOutlined spin />} />}
+        {isError && (
+          <Typography.Text type="danger">{error.message}</Typography.Text>
+        )}
+      </Flex>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
-        {isLoading && <div>Loading...</div>}
-        {isError && <div>{error.message}</div>}
         <UserFilter
           onFilterChange={(filterName, filterValue) => {
             console.log("filter changed", filterName, filterValue);
@@ -124,25 +146,23 @@ export const UsersPage = () => {
             setOpen(true);
           }}
         />
-        {users && (
-          <Table
-            columns={columns}
-            dataSource={users?.data}
-            rowKey="id"
-            pagination={{
-              current: queryParams.page,
-              pageSize: queryParams.limit,
-              total: users?.total,
-              onChange: (page) => {
-                console.log("page changed", page);
-                setQueryParams((prev) => ({
-                  ...prev,
-                  page,
-                }));
-              }
-            }}
-          />
-        )}
+        <Table
+          columns={columns}
+          dataSource={users?.data}
+          rowKey="id"
+          pagination={{
+            current: queryParams.page,
+            pageSize: queryParams.limit,
+            total: users?.total,
+            onChange: (page) => {
+              console.log("page changed", page);
+              setQueryParams((prev) => ({
+                ...prev,
+                page,
+              }));
+            },
+          }}
+        />
         <Modal
           title="Create new user"
           centered
