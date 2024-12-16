@@ -17,7 +17,7 @@ import {
   TableProps,
   Typography,
 } from "antd";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
@@ -26,6 +26,7 @@ import UserFilter from "./UserFilter";
 import UserForm from "./forms/UserForm";
 import { createUser } from "./../../http/api";
 import { PER_PAGE_LIMIT } from "./../../constants/constants";
+import { debounce } from "lodash";
 
 const columns: TableProps<User>["columns"] = [
   {
@@ -122,14 +123,7 @@ export const UsersPage = () => {
 
   const onFilterChange = () => {
     const formData = filterForm.getFieldsValue();
-    // remove undefined or null values
-    Object.keys(formData).forEach((key) => {
-      if (formData[key] === undefined || formData[key] === null) {
-        delete formData[key];
-      }
-    });
 
-    formData.page = 1;
     // if formData is empty, set queryParams to default
     if (Object.keys(formData).length === 0) {
       setQueryParams({
@@ -138,13 +132,27 @@ export const UsersPage = () => {
       });
       return;
     }
-
+    
     // if formData is not empty, set queryParams to formData
-    setQueryParams((prev) => ({
-      ...prev,
-      ...formData,
-    }));
+      debouncedQUpdate();
   }
+
+  const debouncedQUpdate = useMemo(() => debounce(
+    () => {
+      const formData = filterForm.getFieldsValue();
+      // remove undefined or null values
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] === undefined || formData[key] === null) {
+          delete formData[key];
+        }
+      });
+      setQueryParams((prev) => ({
+        ...prev,
+        ...formData
+      }))
+    },
+    500
+  ), []);
 
   if (user && user.role !== "admin") {
     return <Navigate to="/" replace={true} />;
