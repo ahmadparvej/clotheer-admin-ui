@@ -1,49 +1,51 @@
-import { Card, Col, Input, Row, Select } from "antd";
+import { Card, Col, Form, Input, Row, Select } from "antd";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 type UserFilterProps = {
-  onFilterChange: (filterName: string, filterValue: string) => void;
   onCreateClick: () => void;
 };
 
-const UserFilter = ({ onFilterChange, onCreateClick }: UserFilterProps) => {
+const UserFilter = ({ onCreateClick }: UserFilterProps) => {
   return (
     <Card>
       <Row justify={"space-between"}>
         <Col span={16}>
           <Row style={{ gap: "10px" }}>
             <Col span={8}>
-              <Input.Search
-                style={{ width: "100%" }}
-                placeholder="Search"
-                allowClear={true}
-                onChange={(e) => onFilterChange("search", e.target.value)}
-              />
+              <Form.Item name="q">
+                <Input.Search
+                  style={{ width: "100%" }}
+                  placeholder="Search"
+                  allowClear={true}
+                />
+              </Form.Item>
             </Col>
             <Col span={4}>
-              <Select
-                style={{ width: "100%" }}
-                placeholder="Role"
-                allowClear={true}
-                onChange={(value) => onFilterChange("role", value)}
-              >
-                <Select.Option value="admin">admin</Select.Option>
-                <Select.Option value="manager">manager</Select.Option>
-                <Select.Option value="customer">customer</Select.Option>
-              </Select>
+              <Form.Item name="role">
+                <Select
+                  style={{ width: "100%" }}
+                  placeholder="Role"
+                  allowClear={true}
+                >
+                  <Select.Option value="admin">admin</Select.Option>
+                  <Select.Option value="manager">manager</Select.Option>
+                  <Select.Option value="customer">customer</Select.Option>
+                </Select>
+              </Form.Item>
             </Col>
             <Col span={4}>
-              <Select
-                style={{ width: "100%" }}
-                placeholder="Status"
-                allowClear={true}
-                onChange={(value) => onFilterChange("status", value)}
-              >
-                <Select.Option value="active">active</Select.Option>
-                <Select.Option value="inactive">inactive</Select.Option>
-                <Select.Option value="banned">banned</Select.Option>
-              </Select>
+              <Form.Item name="status">
+                <Select
+                  style={{ width: "100%" }}
+                  placeholder="Status"
+                  allowClear={true}
+                >
+                  <Select.Option value="active">active</Select.Option>
+                  <Select.Option value="inactive">inactive</Select.Option>
+                  <Select.Option value="banned">banned</Select.Option>
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
         </Col>

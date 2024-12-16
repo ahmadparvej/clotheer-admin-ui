@@ -74,6 +74,7 @@ const breadcrumbItems = [
 export const UsersPage = () => {
   const { user } = useAuthStore();
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
@@ -119,6 +120,32 @@ export const UsersPage = () => {
     createUserMutation(form.getFieldsValue());
   };
 
+  const onFilterChange = () => {
+    const formData = filterForm.getFieldsValue();
+    // remove undefined or null values
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] === undefined || formData[key] === null) {
+        delete formData[key];
+      }
+    });
+
+    formData.page = 1;
+    // if formData is empty, set queryParams to default
+    if (Object.keys(formData).length === 0) {
+      setQueryParams({
+        page: 1,
+        limit: PER_PAGE_LIMIT,
+      });
+      return;
+    }
+
+    // if formData is not empty, set queryParams to formData
+    setQueryParams((prev) => ({
+      ...prev,
+      ...formData,
+    }));
+  }
+
   if (user && user.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
@@ -138,14 +165,13 @@ export const UsersPage = () => {
         )}
       </Flex>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
-        <UserFilter
-          onFilterChange={(filterName, filterValue) => {
-            console.log("filter changed", filterName, filterValue);
-          }}
-          onCreateClick={() => {
-            setOpen(true);
-          }}
-        />
+        <Form form={filterForm} onFieldsChange={onFilterChange}>
+          <UserFilter
+            onCreateClick={() => {
+              setOpen(true);
+            }}
+          />
+        </Form>
         <Table
           columns={columns}
           dataSource={users?.data}
