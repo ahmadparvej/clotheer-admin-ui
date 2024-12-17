@@ -124,28 +124,19 @@ export const UsersPage = () => {
   const onFilterChange = () => {
     const formData = filterForm.getFieldsValue();
 
-    // if formData is empty, set queryParams to default
-    if (Object.keys(formData).length === 0) {
-      setQueryParams({
-        page: 1,
-        limit: PER_PAGE_LIMIT,
-      });
-      return;
-    }
+    // remove undefined or null values
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] === undefined || formData[key] === null) {
+        formData[key] = "";
+      }
+    });
     
     // if formData is not empty, set queryParams to formData
-      debouncedQUpdate();
+    debouncedQUpdate(formData);
   }
 
   const debouncedQUpdate = useMemo(() => debounce(
-    () => {
-      const formData = filterForm.getFieldsValue();
-      // remove undefined or null values
-      Object.keys(formData).forEach((key) => {
-        if (formData[key] === undefined || formData[key] === null) {
-          delete formData[key];
-        }
-      });
+    (formData) => {
       setQueryParams((prev) => ({
         ...prev,
         ...formData
