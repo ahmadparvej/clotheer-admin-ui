@@ -57,6 +57,12 @@ const columns: TableProps<User>["columns"] = [
     key: "role",
   },
   {
+    title: "Tenant",
+    dataIndex: "tenant",
+    key: "tenant",
+    render: (tenant) => tenant?.name ?? "-",
+  },
+  {
     title: "Action",
     key: "action",
     render: (_, record) => (
