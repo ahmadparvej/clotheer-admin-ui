@@ -26,3 +26,5 @@ export type CreateUser = {
     password: string;
     role: string;
 }
+
+export type UpdateUser = CreateUser & { id: number };

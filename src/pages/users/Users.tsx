@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import {
   Breadcrumb,
+  Button,
   Flex,
   Form,
   message,
@@ -17,10 +18,10 @@ import {
   TableProps,
   Typography,
 } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { getUsers } from "../../http/api";
-import { User } from "../../types";
+import { getUsers, updateUser } from "../../http/api";
+import { UpdateUser, User } from "../../types";
 import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
 import UserForm from "./forms/UserForm";
@@ -28,7 +29,7 @@ import { createUser } from "./../../http/api";
 import { PER_PAGE_LIMIT } from "./../../constants/constants";
 import { debounce } from "lodash";
 
-const columns: TableProps<User>["columns"] = [
+let columns: TableProps<User>["columns"] = [
   {
     title: "ID",
     dataIndex: "id",
@@ -61,16 +62,7 @@ const columns: TableProps<User>["columns"] = [
     dataIndex: "tenant",
     key: "tenant",
     render: (tenant) => tenant?.name ?? "-",
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <span>
-        <Link to={`/users/${record.id}/edit`}>Edit</Link>
-      </span>
-    ),
-  },
+  }
 ];
 
 const breadcrumbItems = [
@@ -80,6 +72,7 @@ const breadcrumbItems = [
 
 export const UsersPage = () => {
   const { user } = useAuthStore();
+  const [editUser, setEditUser] = useState<User | null>(null);
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const [open, setOpen] = useState(false);
@@ -122,9 +115,35 @@ export const UsersPage = () => {
     },
   });
 
+  const { mutate: updateUserMutation } = useMutation({
+    mutationFn: async (user: UpdateUser) => {
+      await updateUser(user, editUser!.id);
+    },
+    mutationKey: ["updateUser"],
+    onSuccess: () => {
+      setOpen(false);
+      form.resetFields();
+      messageApi.success("User updated successfully", 5);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setEditUser(null);
+    },
+    onError: (error) => {
+      messageApi.error(error.message, 5);
+    }
+  });
+
   const onHandleSubmit = async () => {
-    await form.validateFields();
-    createUserMutation(form.getFieldsValue());
+    if (editUser) {
+      await form.validateFields();
+      // remove confirmPassword
+      const payload = form.getFieldsValue();
+      delete payload.confirmPassword;
+      console.log(payload)
+      updateUserMutation(payload);
+    } else {
+      await form.validateFields();
+      createUserMutation(form.getFieldsValue());
+    }
   };
 
   const onFilterChange = () => {
@@ -152,6 +171,12 @@ export const UsersPage = () => {
     500
   ), []);
 
+  useEffect(() => {
+    if (editUser) {
+      form.setFieldsValue(editUser);
+    }
+  }, [editUser]);
+
   if (user && user.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
@@ -174,12 +199,33 @@ export const UsersPage = () => {
         <Form form={filterForm} onFieldsChange={onFilterChange}>
           <UserFilter
             onCreateClick={() => {
+              setEditUser(null);
+              form.resetFields();
               setOpen(true);
             }}
           />
         </Form>
         <Table
-          columns={columns}
+          columns={[...columns, 
+            {
+              title: "Actions",
+              key: "actions",
+              render: (_, record) => {
+                return (
+                  <Space>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setEditUser(record);
+                        setOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </Space>
+                );
+              },
+            }]}
           dataSource={users?.data}
           rowKey="id"
           pagination={{
@@ -187,7 +233,6 @@ export const UsersPage = () => {
             pageSize: queryParams.limit,
             total: users?.total,
             onChange: (page) => {
-              console.log("page changed", page);
               setQueryParams((prev) => ({
                 ...prev,
                 page,
@@ -197,13 +242,13 @@ export const UsersPage = () => {
           }}
         />
         <Modal
-          title="Create new user"
+          title={editUser ? "Edit User" : "Create User"}
           centered
           open={open}
           onOk={() => onHandleSubmit()}
           onCancel={() => setOpen(false)}
           width={1000}
-          okText="Save"
+          okText={"Save"}
         >
           <Form layout="vertical" form={form}>
             <UserForm />

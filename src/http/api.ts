@@ -1,4 +1,4 @@
-import { Credentials, User, UsersData } from "../types";
+import { Credentials, UpdateUser, User, UsersData } from "../types";
 import api from "./client";
 
 //Auth Service
@@ -19,4 +19,8 @@ export const getUsers = async (params: string): Promise<UsersData> => {
 
 export const createUser = async (user: User) => {
   await api.post("/users", user);
-}; 
+};
+
+export const updateUser = async (user: UpdateUser, id: number) => {
+  await api.put(`/users/${id}`, user);
+};
