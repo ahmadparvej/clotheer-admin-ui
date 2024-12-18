@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import type { MenuProps } from 'antd';
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
 import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Navigate } from 'react-router-dom';
 import { useAuthStore } from "../store/store";
 import { BagIcon } from './../components/icons/BagIcon';
 import BasketIcon from './../components/icons/BasketIcon';
@@ -108,6 +108,9 @@ export const DashboardLayout = () => {
     },
   ];  
 
+  if(!user){
+    return <Navigate to={`/auth/login?returnTo=${pathname}`} />
+  }
   // find key of active menu item
   const activeMenuItemKey = items.find((item: MenuItem) => item?.key === pathname.split("/")[1])?.key || 'home';
   
