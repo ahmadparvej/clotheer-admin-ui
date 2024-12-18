@@ -145,7 +145,8 @@ export const UsersPage = () => {
     (formData) => {
       setQueryParams((prev) => ({
         ...prev,
-        ...formData
+        ...formData,
+        page: 1
       }))
     },
     500
