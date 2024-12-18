@@ -13,7 +13,7 @@ const UserFilter = ({ onCreateClick }: UserFilterProps) => {
         <Col span={16}>
           <Row style={{ gap: "10px" }}>
             <Col span={8}>
-              <Form.Item name="q">
+              <Form.Item name="q" style={{ marginBottom: 0 }}>
                 <Input.Search
                   style={{ width: "100%" }}
                   placeholder="Search"
@@ -22,7 +22,7 @@ const UserFilter = ({ onCreateClick }: UserFilterProps) => {
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item name="role">
+              <Form.Item name="role" style={{ marginBottom: 0 }}>
                 <Select
                   style={{ width: "100%" }}
                   placeholder="Role"
@@ -35,7 +35,7 @@ const UserFilter = ({ onCreateClick }: UserFilterProps) => {
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item name="status">
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
                 <Select
                   style={{ width: "100%" }}
                   placeholder="Status"
