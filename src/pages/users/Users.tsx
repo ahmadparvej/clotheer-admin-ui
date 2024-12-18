@@ -193,6 +193,7 @@ export const UsersPage = () => {
                 page,
               }));
             },
+            showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total}`,
           }}
         />
         <Modal
