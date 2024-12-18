@@ -121,7 +121,7 @@ export const DashboardLayout = () => {
       <Layout>
         <Header style={{ padding: "0 24px", background: colorBgContainer }}>
           <Flex justify="space-between" align="center" >
-            <Badge text={user?.role == "admin" ? "Admin" : user?.tenant?.name} status='success'/>
+            <Badge text={`You Are ${user?.role == "admin" ? "Admin": user?.role}`} status='success'/>
             <Flex align="center" gap={10}>
               <Badge dot={true}>
                 <Icon component={BagIcon} />
