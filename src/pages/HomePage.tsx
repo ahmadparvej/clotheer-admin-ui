@@ -1,5 +1,4 @@
-import { Typography } from "antd";
-import { Card, Row, Col, List, Tag, Button } from "antd";
+import { Card, Row, Col, List, Tag, Button, Typography } from "antd";
 import { useAuthStore } from "../store/store";
 
 const { Title } = Typography;

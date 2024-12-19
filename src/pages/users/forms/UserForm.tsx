@@ -1,6 +1,4 @@
-import { Col, Form, Row, Select, Space } from "antd";
-import { Card } from "antd";
-import { Input } from "antd";
+import { Col, Form, Row, Select, Space, Input, Card } from "antd";
 
 const UserForm = () => {
   return (
