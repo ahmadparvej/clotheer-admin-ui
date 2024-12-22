@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, LoadingOutlined, RightOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, LoadingOutlined, RightOutlined } from "@ant-design/icons";
 import {
   useQuery,
   useMutation,
@@ -21,7 +21,7 @@ import {
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { getUsers, updateUser } from "../../http/api";
+import { deleteUser, getUsers, updateUser } from "../../http/api";
 import { UpdateUser, User } from "../../types";
 import { useAuthStore } from "./../../store/store";
 import UserFilter from "./UserFilter";
@@ -133,6 +133,20 @@ export const UsersPage = () => {
     }
   });
 
+  const { mutate: deleteUserMutation } = useMutation({
+    mutationFn: async (id: number) => {
+      await deleteUser(id);
+    },
+    mutationKey: ["deleteUser"],
+    onSuccess: () => {
+      messageApi.success("User deleted successfully", 5);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      messageApi.error(error.message, 5);
+    }
+  })
+
   const onHandleSubmit = async () => {
     if (editUser) {
       await form.validateFields();
@@ -229,8 +243,17 @@ export const UsersPage = () => {
                       <Button
                         type="link"
                         onClick={() => {
-                          setEditUser(record);
-                          setOpen(true);
+                          Modal.confirm({
+                            title: "Are you sure you want to delete this user?",
+                            icon: <ExclamationCircleFilled />,
+                            content: "This action cannot be undone",
+                            okText: "Yes",
+                            okType: "danger",
+                            cancelText: "No",
+                            onOk: () => {
+                              deleteUserMutation(record.id);
+                            },
+                          });
                         }}
                       >
                         <DeleteOutlined />
