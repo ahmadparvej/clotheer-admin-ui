@@ -1,4 +1,4 @@
-import { LoadingOutlined, RightOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, LoadingOutlined, RightOutlined } from "@ant-design/icons";
 import {
   useQuery,
   useMutation,
@@ -16,6 +16,7 @@ import {
   Spin,
   Table,
   TableProps,
+  Tooltip,
   Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -213,15 +214,28 @@ export const UsersPage = () => {
               render: (_, record) => {
                 return (
                   <Space>
-                    <Button
-                      type="link"
-                      onClick={() => {
-                        setEditUser(record);
-                        setOpen(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
+                    <Tooltip title="Edit" color={"#1890ff"}>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditUser(record);
+                          setOpen(true);
+                        }}
+                      >
+                        <EditOutlined />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Delete" color={"#ff4d4f"}>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditUser(record);
+                          setOpen(true);
+                        }}
+                      >
+                        <DeleteOutlined />
+                      </Button>
+                    </Tooltip>
                   </Space>
                 );
               },
